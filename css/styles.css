@@ -471,3 +471,25 @@ p { margin: 0 0 1em; }
 .spec-swatches .sw-forest { background: #1E2A23; }
 .figure-stage.stage-phones img { width: 22%; }
 .figure-stage.stage-phones img:nth-child(2) { width: 25%; }
+/* About: skill groups */
+
+.about-grid { grid-template-columns: 0.9fr 1.6fr; align-items: start; }
+.about-intro { position: sticky; top: 100px; }
+.toolkits { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 20px); }
+.toolkit-code { grid-row: span 2; }
+.toolkit-work { grid-column: 1 / -1; }
+.toolkit-security h3::before { background: var(--ink); }
+.toolkit-work h3::before { background: var(--ink-2); }
+.toolkit h4 { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink-2); margin: 18px 0 10px; }
+.toolkit p + h4 { margin-top: 0; }
+
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-intro { position: static; grid-column: auto; }
+}
+
+@media (max-width: 680px) {
+  .toolkits { grid-template-columns: 1fr; }
+  .toolkit-code { grid-row: auto; }
+  .toolkit-work { grid-column: auto; }
+}
