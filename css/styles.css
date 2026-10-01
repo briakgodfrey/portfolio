@@ -521,7 +521,7 @@ p { margin: 0 0 1em; }
 /* Design to code story: pinned while you scroll */
 
 .story { border-top: 1px solid var(--line); }
-.story-track { height: 230vh; position: relative; }
+.story-track { height: 280vh; position: relative; }
 .story-pin {
   position: sticky; top: 72px; min-height: calc(100vh - 72px);
   display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(28px, 5vw, 64px); align-items: center;
@@ -610,7 +610,7 @@ p { margin: 0 0 1em; }
 .contact h2.fill-text { color: var(--ink); }
 
 @media (max-width: 900px) {
-  .story-track { height: 200vh; }
+  .story-track { height: 240vh; }
   .story-pin { grid-template-columns: 1fr; gap: 20px; align-content: center; }
 }
 
@@ -624,4 +624,20 @@ p { margin: 0 0 1em; }
   .story-text h2 { margin-bottom: 14px; }
   .morph { height: 260px; }
   .morph .code { font-size: 12px; padding: 18px; }
+}
+
+/* Smooth story: with motion on, scroll position drives the story directly */
+
+.motion .morph { transform: scale(var(--enter, 1)); }
+.motion .morph .morph-btn {
+  transition: none;
+  opacity: calc(1 - var(--out, 0));
+  transform: translate(-50%, calc(-50% - 28px * var(--out, 0))) scale(calc(1 - 0.08 * var(--out, 0)));
+  outline-color: rgba(125, 227, 236, calc(0.9 * var(--spec, 0)));
+}
+.motion .morph .morph-note { transition: none; opacity: calc(var(--spec, 0) * (1 - var(--out, 0))); }
+.motion .morph .morph-code {
+  transition: none;
+  opacity: var(--in, 0);
+  transform: translateY(calc(24px * (1 - var(--in, 0))));
 }

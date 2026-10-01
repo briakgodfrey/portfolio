@@ -79,23 +79,49 @@ if (tocLinks.length && 'IntersectionObserver' in window) {
   });
 }
 
-// Design to code story: the step follows how far the pinned section has scrolled.
-// It works with reduced motion too; only the transitions are switched off.
+// Design to code story. Scrolling sets a target position, and each frame the
+// animation eases toward it, so the button glides into its spec and then its code.
+// With reduced motion it simply switches between the three steps.
 
 const story = document.querySelector('.story-track');
 const morph = document.querySelector('.morph');
 const storySteps = document.querySelectorAll('.story-steps li');
 const storyBar = document.querySelector('.story-progress i');
+let storyTarget = 0;
+let storyShown = 0;
+let storyFrame = null;
+
+const clamp = (v) => Math.min(1, Math.max(0, v));
+const ease = (from, to, v) => {
+  const t = clamp((v - from) / (to - from));
+  return t * t * (3 - 2 * t);
+};
+
+const paintStory = (p) => {
+  const step = p < 0.34 ? 0 : p < 0.67 ? 1 : 2;
+  morph.dataset.step = step;
+  storySteps.forEach((li, i) => li.classList.toggle('is-on', i === step));
+  storyBar.style.width = `${p * 100}%`;
+  morph.style.setProperty('--enter', (0.94 + 0.06 * ease(0, 0.18, p)).toFixed(4));
+  morph.style.setProperty('--spec', ease(0.16, 0.36, p).toFixed(4));
+  morph.style.setProperty('--out', ease(0.5, 0.62, p).toFixed(4));
+  morph.style.setProperty('--in', ease(0.6, 0.8, p).toFixed(4));
+};
+
+const animateStory = () => {
+  storyShown += (storyTarget - storyShown) * 0.12;
+  if (Math.abs(storyTarget - storyShown) < 0.0005) storyShown = storyTarget;
+  paintStory(storyShown);
+  storyFrame = storyShown === storyTarget ? null : requestAnimationFrame(animateStory);
+};
 
 const updateStory = () => {
   if (!story) return;
   const box = story.getBoundingClientRect();
   const travel = box.height - window.innerHeight * 0.85;
-  const progress = Math.min(1, Math.max(0, -box.top / travel));
-  const step = progress < 0.34 ? 0 : progress < 0.67 ? 1 : 2;
-  morph.dataset.step = step;
-  storySteps.forEach((li, i) => li.classList.toggle('is-on', i === step));
-  storyBar.style.width = `${progress * 100}%`;
+  storyTarget = clamp(-box.top / travel);
+  if (reduceMotion) { storyShown = storyTarget; paintStory(storyShown); return; }
+  if (!storyFrame) storyFrame = requestAnimationFrame(animateStory);
 };
 
 // Split text into word spans, keeping nested tags like <em>.
@@ -181,9 +207,12 @@ if (!reduceMotion) {
 
   updateMotion = () => {
     const vh = window.innerHeight;
+    const atBottom = window.scrollY + vh >= document.documentElement.scrollHeight - 4;
     fills.forEach(({ el, words }) => {
       const top = el.getBoundingClientRect().top;
-      const progress = Math.min(1, Math.max(0, (vh * 0.9 - top) / (vh * 0.45)));
+      // Fully lit by the time the heading is just past the middle of the screen,
+      // and always fully lit at the bottom of the page.
+      const progress = atBottom ? 1 : Math.min(1, Math.max(0, (vh * 0.9 - top) / (vh * 0.35)));
       const lit = Math.round(progress * words.length);
       words.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
     });
