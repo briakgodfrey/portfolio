@@ -656,3 +656,11 @@ p { margin: 0 0 1em; }
   padding: 7px 10px; border-radius: 999px;
   background: var(--accent-soft); color: var(--accent);
 }
+/* Resume link in the hero */
+
+.btn-link {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 6px;
+  font-size: 15.5px; font-weight: 600; color: var(--accent); text-decoration: none;
+}
+.btn-link::after { content: "↓"; transition: transform 0.2s ease; }
+.btn-link:hover::after { transform: translateY(2px); }
